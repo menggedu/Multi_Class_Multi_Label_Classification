@@ -6,6 +6,8 @@ cores = cpu_count()
 # 分块个数
 partitions = cores
 
+def f1(x):
+    return x**2
 
 def parallelize(df, func):
     data_split = np.array_split(df, partitions)
@@ -17,3 +19,7 @@ def parallelize(df, func):
 
     pool.join()
     return data
+
+if __name__ == '__main__':
+    data = pd.DataFrame(np.arange(20))
+    print(parallelize(data,f1))

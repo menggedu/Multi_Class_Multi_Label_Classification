@@ -40,14 +40,14 @@ def proc(df):
     return df
 
 def build_data(params):
-    '''
+
     if os.path.exists(os.path.join(root, 'data', 'X_train.npy')):
         X_train = np.load(os.path.join(root, 'data', 'X_train.npy'))
         X_test = np.load(os.path.join(root, 'data', 'X_test.npy'))
         y_train = np.load(os.path.join(root, 'data', 'y_train.npy'))
         y_test = np.load(os.path.join(root, 'data', 'y_test.npy'))
         return X_train, X_test, y_train, y_test
-    '''
+
 
     data = pd.read_csv(params['data_path'],header = None).rename(columns={0: 'label', 1: 'content'})
     processed_data = parallelize(data, proc)
@@ -56,7 +56,7 @@ def build_data(params):
     text_preprocesser.fit_on_texts(processed_data['content'])
     #save vocab
     word_dict = text_preprocesser.word_index
-    with open(params['vocab_path']+'vocab.txt', 'w', encoding='utf-8') as f:
+    with open(params['vocab_path'], 'w', encoding='utf-8') as f:
         for k, v in word_dict.items():
             f.write(f'{k}\t{str(v)}\n')
 
@@ -81,23 +81,32 @@ def build_data(params):
 
     X_train, X_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=42)
     # 保存数据
-    # np.save(os.path.join(root, 'data', 'X_test.npy'), X_test)
-    # np.save(os.path.join(root, 'data', 'y_train.npy'), y_train)
-    # np.save(os.path.join(root, 'data', 'y_test.npy'), y_test)
-    return X_train, X_test, y_train, y_test
+    np.save(os.path.join(root,'data','X_train.npy'),X_train)
+    np.save(os.path.join(root, 'data', 'X_test.npy'), X_test)
+    np.save(os.path.join(root, 'data', 'y_train.npy'), y_train)
+    np.save(os.path.join(root, 'data', 'y_test.npy'), y_test)
+
+    return X_train, X_test, y_train, y_test, mlb, word_dict # vocab
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='This is the TextCNN test project.')
+    parser = argparse.ArgumentParser(description='This is the data processing ')
     parser.add_argument('-d', '--data_path', default='data/baidu_95.csv', type=str,
                         help='data path')
     parser.add_argument('-v', '--vocab_save_dir', default='data/', type=str,
                         help='data path')
     parser.add_argument('-vocab_size', default=50000, type=int, help='Limit vocab size.(default=50000)')
-    parser.add_argument('-p', '--padding_size', default=200, type=int, help='Padding size of sentences.(default=128)')
-    parser.add_argument('-train_mode', default='multi_class', type=str, help='multi-class or multi-label')
+    parser.add_argument('-p', '--padding_size', default=300, type=int, help='Padding size of sentences.(default=128)')
+    parser.add_argument('-train_mode', default='multi_label', type=str, help='multi-class or multi-label')
+    #parser.add_argument('-BUFFER_SIZE', default='3000', type=str, help='multi-class or multi-label')
     params = parser.parse_args()
 
+
     print('Parameters:', params)
+
+    # 处理生成数据
+    x_train,x_test, y_train,y_test,_,vocab = build_data(params)
+    print(f"vocab size : {len(vocab)} ")
+
 
 

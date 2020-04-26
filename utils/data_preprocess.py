@@ -3,7 +3,7 @@ import numpy as np
 import os
 from utils.config import root
 """
-计算标签达1626个。。。
+计算标签达1626个。。。  主要是原数据的预处理
 """
 
 def preprocess_data(df):
